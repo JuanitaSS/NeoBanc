@@ -1,0 +1,74 @@
+.contenedorLogin {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 150vh;
+  background-color: rgb(210, 203, 255);
+}
+
+
+.titulo {
+  
+  
+  color: rgb(0, 0, 0); 
+  text-align: center;
+  margin-bottom: 90px;
+  font-family: "Qwitcher Grypen", cursive;
+  font-weight: 900;
+  font-style: normal;
+}
+
+
+
+.cajaLogin {
+  background-color: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+
+.grupoInput {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+
+.grupoInput label {
+  display: block;
+  
+  margin-bottom: 5px;
+  color: rgb(0, 0, 0);
+  
+}
+
+.grupoInput input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+
+.botonLogin {
+  width: 100%;
+  padding: 12px;
+  background-color: rgb(80, 58, 209);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.botonLogin:hover {
+  background-color: rgb(210, 203, 255);; 
+}
