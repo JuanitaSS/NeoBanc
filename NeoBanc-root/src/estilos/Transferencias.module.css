@@ -1,0 +1,64 @@
+.contenedorTransferencia {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    background-color: rgb(243, 243, 243 ); ;
+  }
+  
+
+  .titulo {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: rgb(0, 0, 0); ;
+  }
+  
+
+  .formulario {
+    background-color:  rgb(210, 203, 255);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 400px;
+  }
+  
+
+  .grupoInput {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+  }
+  
+  .grupoInput label {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: rgb(80, 58, 209);;
+  }
+  
+  .grupoInput input,
+  .grupoInput select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid rgb(80, 58, 209);;
+    border-radius: 5px;
+  }
+  
+
+  .botonTransferir {
+    background-color: rgb(80, 58, 209);;
+    color: white;
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .botonTransferir:hover {
+    background-color: rgb(210, 203, 255);;
+  }
+  
