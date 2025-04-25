@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Principal from './componentes/Principal.jsx';
@@ -10,7 +9,6 @@ import Transferencias from './componentes/Transferencias.jsx'
 import Yo from './componentes/Yo.jsx'
 
 function App() {
-  const [activoPrin, setactivoPrin] = useState(false);
 
   return (
     <BrowserRouter>

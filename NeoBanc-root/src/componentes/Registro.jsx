@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import estilos from '../estilos/Resgistro.module.css';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
 function Registro() {
   const [nombre, setNombre] = useState('');
@@ -10,25 +11,84 @@ function Registro() {
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [celular, setCelular] = useState('');
-  const [tipoCuenta, setTipoCuenta] = useState('ahorros');
+  
 
   const navigate = useNavigate();
 
   const manejarEnvio = (e) => {
     e.preventDefault();
-
-    console.log({
-      nombre,
-      cc,
-      fechaNacimiento,
-      correo,
-      usuario,
-      contrasena,
-      celular,
-      tipoCuenta
-    });
-
-    navigate('/Plataforma');
+    const fechaNacimientoFormat = format(fechaNacimiento,"yyyy-MM-dd'T'HH:mm:ss")
+    const data ={
+      usuarioId:0,
+      nombreCompleto: nombre,
+      identificacion: cc,
+      fechaNacimiento: fechaNacimientoFormat,
+      correoElectronico: correo,
+      telefono:celular, 
+      fechaRegistro: fechaNacimientoFormat,
+      userValidName:usuario,
+      passwordHash:contrasena
+    }
+    fetch('https://localhost:7220/api/Usuario',{
+      method: 'POST',
+      headers:{'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify(data)
+    })
+      .then(async (res)=>{
+        if(!res.ok)
+        {
+          const errorData = await res.text()
+          alert(errorData)
+          throw new Error(errorData)
+        }
+        return res.json()
+      })
+      .then(()=>{
+        fetch(`https://localhost:7220/api/Usuario/identificacion=${cc}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }})
+          .then(async (res)=>
+          {
+            if(!res.ok)
+            {
+              const errorData = await res.text()
+              alert(errorData)
+              throw new Error(errorData)
+            }
+            return res.json();
+          })
+          .then((usuario)=>{
+            const dataCuenta ={
+              cuentaId:0,
+              usuarioId: usuario.usuarioId,
+              numeroCuenta: usuario.telefono,
+              saldo:0,
+              estadoCuenta:'Activa',
+              fechaCreacion:usuario.fechaRegistro
+            }
+            fetch('https://localhost:7220/api/CuentaBancaria',{
+              method: 'POST',
+              headers:{'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+              body: JSON.stringify(dataCuenta)
+            })
+            .then(async (res)=>{
+              if(!res.ok)
+              {
+                const errorData = await res.text()
+                alert(errorData)
+                throw new Error(errorData)
+              }
+              return res.json();
+            })
+            .then(()=>{
+              navigate('/login')
+            })
+            .catch((err) => console.error("Error al registrar la cuenta:", err))
+          })
+      })
+      .catch((err) => console.error("Error al registrar el usuario:", err))
   };
 
   return (

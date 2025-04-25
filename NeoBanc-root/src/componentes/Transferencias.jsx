@@ -1,42 +1,77 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Menu from './Menu';
 import estilos from '../estilos/Transferencias.module.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import Decimal from 'decimal.js'
+import { format } from 'date-fns';
 
 function Transferencias() {
-  const [numeroCuentaDestino, setNumeroCuentaDestino] = useState('');
-  const [valorTransferir, setValorTransferir] = useState('');
+  const location = useLocation();
+  const [user] = useState(location.state?.user || null);
+  const [cuenta] = useState(location.state?.cuenta || null);
+  const [numeroCuentaDestino,setNumeroCuentaDestino] = useState('')
+  const [valorTransferir,setValorTransferir] = useState('')
   const [bancoSeleccionado, setBancoSeleccionado] = useState('');
   const [bancos, setBancos] = useState([]);
-
+  const fechaCreacionFormat = format("2025-05-24","yyyy-MM-dd'T'HH:mm:ss")
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simulamos una petición a la base de datos para obtener los bancos
-    const bancosDesdeDB = [
-      { BancoID: 1, Nombre: 'Banco Nacional', CodigoBanco: 'BN001' },
-      { BancoID: 2, Nombre: 'Banco Popular', CodigoBanco: 'BP002' },
-      { BancoID: 3, Nombre: 'Banco Ágil', CodigoBanco: 'BA003' },
-    ];
-    setBancos(bancosDesdeDB);
+    const cargarBancos = async () => {
+      try {
+        const response = await fetch('https://localhost:7220/api/bancoexterno', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+  
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+  
+        const data = await response.json();
+        setBancos(data);
+      } catch (err) {
+        console.error("Error al consultar los bancos:", err);
+      }
+    };
+  
+    cargarBancos();
   }, []);
-
   const manejarEnvio = (e) => {
     e.preventDefault();
-    const transferencia = {
-      numeroCuentaDestino,
-      monto: parseFloat(valorTransferir),
-      bancoDestinoID: parseInt(bancoSeleccionado),
-      esInterna: false, // Siempre externo
+    const transferenciaSalida = {
+      transaccionId:0,
+      cuentaOrigenId:cuenta?.cuentaId,
+      cuentaDestinoId:null,
+      numeroCuentaDestino: numeroCuentaDestino,
+      monto: new Decimal(valorTransferir),
+      bancoDestinoId: parseInt(bancoSeleccionado),
+      esInterna: false,
+      estadoTransaccion:'Pendiente',
+      fechaTransaccion:fechaCreacionFormat
     };
-
-    console.log('Datos enviados:', transferencia);
-
-    // Simular envío a backend
-    alert('Transferencia a banco nacional registrada con éxito');
-    navigate('/plataforma');
-  };
-
+    fetch('https://localhost:7220/api/transaccion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify(transferenciaSalida),
+    })
+      .then(async(response) => {
+        if(!response.ok)
+          {
+            const errorData = await response.text()
+            alert(errorData)
+            throw new Error(errorData)
+          }
+        return response.json();
+      })
+      .then(() => {
+        alert('Transferencia exitosa');
+        navigate('/plataforma', { state: { user:user, cuenta: cuenta } });
+      })
+      .catch((error) => {
+        alert('Error al realizar la transferencia',error);
+      });
+    };
   return (
     <div>
       <Menu />
@@ -54,8 +89,8 @@ function Transferencias() {
             >
               <option value="">Seleccione un banco</option>
               {bancos.map((banco) => (
-                <option key={banco.BancoID} value={banco.BancoID}>
-                  {banco.Nombre}
+                <option key={banco.bancoId} value={banco.bancoId}>
+                  {banco.nombre}
                 </option>
               ))}
             </select>

@@ -9,10 +9,44 @@ function Login() {
 
   const manejarEnvio = (evento) => {
     evento.preventDefault();
-    
-    console.log('Usuario:', usuario, 'Contraseña:', contrasena);
-
-    navigate('/Plataforma'); 
+    fetch(`https://localhost:7220/api/Usuario/Login/user=${usuario}-password${contrasena}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }})
+      .then(async (res)=>
+      {
+        if(!res.ok)
+        {
+          const errorData = await res.text()
+          alert(errorData)
+          throw new Error(errorData)
+        }
+        return res.json();
+      })
+      .then((usuario)=>
+      {
+        fetch(`https://localhost:7220/api/CuentaBancaria/numerocuenta=${usuario.telefono}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }})
+          .then(async (res)=>
+          {
+            if(!res.ok)
+            {
+              const errorData = await res.text()
+              alert(errorData)
+              throw new Error(errorData)
+            }
+            return res.json();
+          })
+          .then((cuenta)=>{
+            navigate('/Plataforma',{state: { user: usuario, cuenta:cuenta } })
+          })
+          .catch((err) => console.error("Error al consultar la cuenta:", err))
+      })
+      .catch((err) => console.error("Error al autenticar usuario:", err));
   };
 
   return (
