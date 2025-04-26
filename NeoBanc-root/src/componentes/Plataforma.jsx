@@ -79,12 +79,12 @@ function Plataforma() {
 
       <div className={estilos.botonera}>
         <Link to="/Saldos" state ={{ user:user,cuenta:cuenta }} className={estilos.botonAccion}>
-          <i className="material-icons">date_range</i> 
+          <i className="material-icons">date_range</i>{" "}
           Saldos y Movimientos
         </Link>
         
         <Link to="/Transferencias" state ={{ user:user,cuenta:cuenta }} className={estilos.botonAccion}>
-          <i className="material-icons">near_me</i> 
+          <i className="material-icons">near_me</i>{" "}
           Transferencias
         </Link>
         

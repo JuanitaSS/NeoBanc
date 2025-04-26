@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'; 
 import estilos from "../estilos/Principal.module.css"; 
 
@@ -30,7 +30,7 @@ function Principal() {
 
       <div className={estilos.carousel}>
         {slides.map((src, index) => (
-          <div className={estilos.mySlides} style={{ display: index === slideIndex ? "block" : "none" }} key={index}>
+          <div className={estilos.mySlides} style={{ display: index === slideIndex ? "block" : "none" }} key={src}>
             <img src={src} alt={`Imagen ${index + 1}`} />
           </div>
         ))}

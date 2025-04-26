@@ -41,7 +41,7 @@ function Saldos() {
       .catch((err) => console.error("Error al consultar transferencias:", err));
     return banco.nombre
   }
-  var trans = transfer;
+  let trans = transfer;
   return (
     <div>
       <Menu />

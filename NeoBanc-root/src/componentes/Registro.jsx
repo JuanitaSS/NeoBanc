@@ -15,81 +15,85 @@ function Registro() {
 
   const navigate = useNavigate();
 
-  const manejarEnvio = (e) => {
+  const manejarEnvio = async (e) => {
     e.preventDefault();
-    const fechaNacimientoFormat = format(fechaNacimiento,"yyyy-MM-dd'T'HH:mm:ss")
-    const data ={
-      usuarioId:0,
-      nombreCompleto: nombre,
-      identificacion: cc,
-      fechaNacimiento: fechaNacimientoFormat,
-      correoElectronico: correo,
-      telefono:celular, 
-      fechaRegistro: fechaNacimientoFormat,
-      userValidName:usuario,
-      passwordHash:contrasena
+  
+    try {
+      const fechaNacimientoFormat = format(fechaNacimiento, "yyyy-MM-dd'T'HH:mm:ss");
+  
+      const data = {
+        usuarioId: 0,
+        nombreCompleto: nombre,
+        identificacion: cc,
+        fechaNacimiento: fechaNacimientoFormat,
+        correoElectronico: correo,
+        telefono: celular,
+        fechaRegistro: fechaNacimientoFormat,
+        userValidName: usuario,
+        passwordHash: contrasena
+      };
+  
+      // Crear usuario
+      const resUsuario = await fetch('https://localhost:7220/api/Usuario', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify(data)
+      });
+  
+      if (!resUsuario.ok) {
+        const errorData = await resUsuario.text();
+        alert(errorData);
+        throw new Error(errorData);
+      }
+  
+      await resUsuario.json();
+  
+      // Buscar usuario
+      const resBuscarUsuario = await fetch(`https://localhost:7220/api/Usuario/identificacion=${cc}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+  
+      if (!resBuscarUsuario.ok) {
+        const errorData = await resBuscarUsuario.text();
+        alert(errorData);
+        throw new Error(errorData);
+      }
+  
+      const usuario = await resBuscarUsuario.json();
+  
+      // Crear cuenta bancaria
+      const dataCuenta = {
+        cuentaId: 0,
+        usuarioId: usuario.usuarioId,
+        numeroCuenta: usuario.telefono,
+        saldo: 0,
+        estadoCuenta: 'Activa',
+        fechaCreacion: usuario.fechaRegistro
+      };
+  
+      const resCuenta = await fetch('https://localhost:7220/api/CuentaBancaria', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify(dataCuenta)
+      });
+  
+      if (!resCuenta.ok) {
+        const errorData = await resCuenta.text();
+        alert(errorData);
+        throw new Error(errorData);
+      }
+  
+      await resCuenta.json();
+  
+      // Navegar al login
+      navigate('/login');
+  
+    } catch (err) {
+      console.error("Error en el registro:", err);
     }
-    fetch('https://localhost:7220/api/Usuario',{
-      method: 'POST',
-      headers:{'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify(data)
-    })
-      .then(async (res)=>{
-        if(!res.ok)
-        {
-          const errorData = await res.text()
-          alert(errorData)
-          throw new Error(errorData)
-        }
-        return res.json()
-      })
-      .then(()=>{
-        fetch(`https://localhost:7220/api/Usuario/identificacion=${cc}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }})
-          .then(async (res)=>
-          {
-            if(!res.ok)
-            {
-              const errorData = await res.text()
-              alert(errorData)
-              throw new Error(errorData)
-            }
-            return res.json();
-          })
-          .then((usuario)=>{
-            const dataCuenta ={
-              cuentaId:0,
-              usuarioId: usuario.usuarioId,
-              numeroCuenta: usuario.telefono,
-              saldo:0,
-              estadoCuenta:'Activa',
-              fechaCreacion:usuario.fechaRegistro
-            }
-            fetch('https://localhost:7220/api/CuentaBancaria',{
-              method: 'POST',
-              headers:{'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-              body: JSON.stringify(dataCuenta)
-            })
-            .then(async (res)=>{
-              if(!res.ok)
-              {
-                const errorData = await res.text()
-                alert(errorData)
-                throw new Error(errorData)
-              }
-              return res.json();
-            })
-            .then(()=>{
-              navigate('/login')
-            })
-            .catch((err) => console.error("Error al registrar la cuenta:", err))
-          })
-      })
-      .catch((err) => console.error("Error al registrar el usuario:", err))
   };
+  
 
   return (
     <div className={estilos.contenedor}>
